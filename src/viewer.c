@@ -37,7 +37,7 @@ void pixel (uint16_t x, uint16_t y) {
     SDL_RenderFillRect(sdl_renderer, &rect);
 }
 
-extern const char hdl_font[464];
+extern const unsigned char HDL_FONT[2048];
 
 void text (uint16_t x, uint16_t y, const char *text, uint8_t fontSize) {
 
@@ -46,8 +46,6 @@ void text (uint16_t x, uint16_t y, const char *text, uint8_t fontSize) {
     int acol = 0;
 
     for (int g = 0; g < len; g++) {
-		// Starting character in single quotes
-		int off = (text[g] - '!') * 8;
 
         if (text[g] == '\n') {
 			line++;
@@ -58,16 +56,12 @@ void text (uint16_t x, uint16_t y, const char *text, uint8_t fontSize) {
 			acol++;
 		}
 
-		if (off < 0 && off > sizeof(hdl_font) / 8)
-			continue;
-
-		
 		for (int py = 0; py < 8; py++) {
-			for (int px = 0; px < 8; px++) {
-				if ((hdl_font[off + py] >> (7 - px)) & 1) {
+			for (int px = 0; px < 5; px++) {
+				if ((HDL_FONT[text[g] * 8 + py] >> (7 - px)) & 1) {
                     SDL_Rect rect = {
-                        .x = (x + (px + acol * 10) * fontSize) * TEST_MULTISAMPLING,
-                        .y = (y + (py + line * 10) * fontSize) * TEST_MULTISAMPLING,
+                        .x = (x + (px + acol * 6) * fontSize) * TEST_MULTISAMPLING,
+                        .y = (y + (py + line * 6) * fontSize) * TEST_MULTISAMPLING,
                         .w = fontSize * TEST_MULTISAMPLING,
                         .h = fontSize * TEST_MULTISAMPLING
                     };
@@ -245,6 +239,9 @@ int main (int argc, char *argv[]) {
     hdl_interface.f_hline = hLine;
     hdl_interface.f_text = text;
     hdl_interface.f_pixel = pixel;
+
+    hdl_interface.textHeight = 5;
+    hdl_interface.textWidth = 5;
 
     HDL_SetBinding(&hdl_interface, "HOURS", 1, &time_hours);
     HDL_SetBinding(&hdl_interface, "MINS", 2, &time_minutes);

@@ -1,0 +1,12 @@
+<box flexdir="row">
+    <box flex=1>
+        abcdefghijklm\n
+        nopqrstuvwxyz\n
+        1234567890\n
+    </box>
+    <box flex=1 size=2>
+        abcdefghijklm\n
+        nopqrstuvwxyz\n
+        1234567890\n
+    </box>
+</box>
