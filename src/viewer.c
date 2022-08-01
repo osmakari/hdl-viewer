@@ -8,26 +8,29 @@
 // Multiply the size of a pixel
 #define TEST_MULTISAMPLING 3
 
+#define SCREEN_WIDTH 80
+#define SCREEN_HEIGHT 128
+
 SDL_Window *sdl_window;
 SDL_Renderer *sdl_renderer;
 
 struct HDL_Interface hdl_interface;
 
-void clearScreen (uint16_t x, uint16_t y, uint16_t w, uint16_t h) {
+void clearScreen (int16_t x, int16_t y, uint16_t w, uint16_t h) {
     SDL_SetRenderDrawColor(sdl_renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(sdl_renderer);
     SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 }
 
-void hLine (uint16_t x, uint16_t y, int16_t len) {
+void hLine (int16_t x, int16_t y, int16_t len) {
     SDL_RenderDrawLine(sdl_renderer, x * TEST_MULTISAMPLING, y * TEST_MULTISAMPLING, (x + len) * TEST_MULTISAMPLING, y * TEST_MULTISAMPLING);
 }
 
-void vLine (uint16_t x, uint16_t y, int16_t len) {
+void vLine (int16_t x, int16_t y, int16_t len) {
     SDL_RenderDrawLine(sdl_renderer, x * TEST_MULTISAMPLING, y * TEST_MULTISAMPLING, x * TEST_MULTISAMPLING, (y + len) * TEST_MULTISAMPLING);
 }
 
-void pixel (uint16_t x, uint16_t y) {
+void pixel (int16_t x, int16_t y) {
     SDL_Rect rect = {
         .x = x * TEST_MULTISAMPLING,
         .y = y * TEST_MULTISAMPLING,
@@ -39,7 +42,7 @@ void pixel (uint16_t x, uint16_t y) {
 
 extern const unsigned char HDL_FONT[2048];
 
-void text (uint16_t x, uint16_t y, const char *text, uint8_t fontSize) {
+void text (int16_t x, int16_t y, const char *text, uint8_t fontSize) {
 
     int len = strlen(text);
     int line = 0;
@@ -65,6 +68,10 @@ void text (uint16_t x, uint16_t y, const char *text, uint8_t fontSize) {
                         .w = fontSize * TEST_MULTISAMPLING,
                         .h = fontSize * TEST_MULTISAMPLING
                     };
+                    if(rect.x < 0 || rect.x + rect.w > SCREEN_WIDTH * TEST_MULTISAMPLING || 
+                        rect.y < 0 || rect.y + rect.h > SCREEN_HEIGHT * TEST_MULTISAMPLING)
+                        continue;
+                    
                     SDL_RenderFillRect(sdl_renderer, &rect);
 				}
 			}
@@ -226,12 +233,12 @@ int main (int argc, char *argv[]) {
     sdl_window = SDL_CreateWindow("HDL VIEWER",
                                        SDL_WINDOWPOS_CENTERED,
                                        SDL_WINDOWPOS_CENTERED,
-                                       80 * TEST_MULTISAMPLING, 128 * TEST_MULTISAMPLING, 0);
+                                       SCREEN_WIDTH * TEST_MULTISAMPLING, SCREEN_HEIGHT * TEST_MULTISAMPLING, 0);
 
     sdl_renderer = SDL_CreateRenderer(sdl_window, 0, 0);
 
     // Initialize HDL
-    hdl_interface = HDL_CreateInterface(80, 128, HDL_COLORS_MONO, 0);
+    hdl_interface = HDL_CreateInterface(SCREEN_WIDTH, SCREEN_HEIGHT, HDL_COLORS_MONO, 0);
 
     hdl_interface.f_clear = clearScreen;
     hdl_interface.f_render = renderScreen;
