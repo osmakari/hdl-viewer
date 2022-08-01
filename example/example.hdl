@@ -3,8 +3,10 @@
         abcdefghijklm\n
         nopqrstuvwxyz\n
         1234567890\n
+        14351\n
+        qssdjasias
     </box>
-    <box flex=1 size=2>
+    <box flex=1 size=1>
         1234567890
     </box>
 </box>

@@ -63,7 +63,7 @@ void text (int16_t x, int16_t y, const char *text, uint8_t fontSize) {
 			for (int px = 0; px < 5; px++) {
 				if ((HDL_FONT[text[g] * 8 + py] >> (7 - px)) & 1) {
                     SDL_Rect rect = {
-                        .x = (x + (px + acol * 6) * fontSize) * TEST_MULTISAMPLING,
+                        .x = (x + (px + acol * 5) * fontSize) * TEST_MULTISAMPLING,
                         .y = (y + (py + line * 6) * fontSize) * TEST_MULTISAMPLING,
                         .w = fontSize * TEST_MULTISAMPLING,
                         .h = fontSize * TEST_MULTISAMPLING
@@ -247,8 +247,8 @@ int main (int argc, char *argv[]) {
     hdl_interface.f_text = text;
     hdl_interface.f_pixel = pixel;
 
-    hdl_interface.textHeight = 5;
-    hdl_interface.textWidth = 5;
+    hdl_interface.textHeight = 6;
+    hdl_interface.textWidth = 4;
 
     HDL_SetBinding(&hdl_interface, "HOURS", 1, &time_hours);
     HDL_SetBinding(&hdl_interface, "MINS", 2, &time_minutes);
