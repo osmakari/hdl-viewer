@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 // Multiply the size of a pixel
-#define TEST_MULTISAMPLING 3
+#define TEST_MULTISAMPLING 4
 
 #define SCREEN_WIDTH 80
 #define SCREEN_HEIGHT 128
@@ -15,6 +15,8 @@ SDL_Window *sdl_window;
 SDL_Renderer *sdl_renderer;
 
 struct HDL_Interface hdl_interface;
+
+int rfsh = 0;
 
 void clearScreen (int16_t x, int16_t y, uint16_t w, uint16_t h) {
     SDL_SetRenderDrawColor(sdl_renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
@@ -173,6 +175,48 @@ int buildPage (const char *iFile, struct HDL_Interface *interface) {
     return 0;
 }
 
+int err = 0;
+
+#if 0
+const int role = 1;
+#else
+const int role = 0;
+#endif
+
+enum DSP_View {
+    VIEW_MAIN,
+    VIEW_SLEEP
+} view;
+
+int battery_percent = 63;
+
+// Battery sprite, calculated from battery percent
+int battery_sprite = 0;
+
+// Bluetooth rssi
+int bt_rssi = 0;
+
+char time_dsp[16];
+char date_dsp[16];
+
+int charging = 0;
+
+// Sprite offset for battery icons
+#define SPRITES_OFFSET_BATTERY  9
+// Battery sprite count
+#define SPRITES_BATTERY_COUNT   5
+
+// Set sleep view
+void display_set_sleep () {
+    view = VIEW_SLEEP;
+    HDL_Update(&hdl_interface);
+}
+
+// Updates battery sprite index 
+void update_battery_sprite () {
+    battery_sprite = SPRITES_BATTERY_COUNT - (((battery_percent >= 100 ? 99 : battery_percent) * SPRITES_BATTERY_COUNT) / 100) - 1 + SPRITES_OFFSET_BATTERY;
+}
+
 int main (int argc, char *argv[]) {
 
     if(argc < 2) {
@@ -250,9 +294,18 @@ int main (int argc, char *argv[]) {
     hdl_interface.textHeight = 6;
     hdl_interface.textWidth = 4;
 
-    HDL_SetBinding(&hdl_interface, "HOURS", 1, &time_hours);
-    HDL_SetBinding(&hdl_interface, "MINS", 2, &time_minutes);
-    HDL_SetBinding(&hdl_interface, "HIDEBAT", 3, &hide_battery);
+    view = VIEW_MAIN;
+    update_battery_sprite();
+
+    HDL_SetBinding(&hdl_interface, "role", 1, &role);
+    HDL_SetBinding(&hdl_interface, "view", 2, &view);
+    HDL_SetBinding(&hdl_interface, "batt", 3, &battery_percent);
+    HDL_SetBinding(&hdl_interface, "rfsh", 4, &rfsh);
+    HDL_SetBinding(&hdl_interface, "battsprite", 5, &battery_sprite);
+    HDL_SetBinding(&hdl_interface, "btrssi", 6, &bt_rssi);
+    HDL_SetBinding(&hdl_interface, "time_dsp", 7, &time_dsp);
+    HDL_SetBinding(&hdl_interface, "date_dsp", 8, &date_dsp);
+    HDL_SetBinding(&hdl_interface, "chrg", 9, &charging);
 
 
     buildPage(filename, &hdl_interface);
