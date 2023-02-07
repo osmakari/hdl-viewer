@@ -25,19 +25,19 @@ void clearScreen (int16_t x, int16_t y, uint16_t w, uint16_t h) {
 }
 
 void hLine (int16_t x, int16_t y, int16_t len) {
-    SDL_RenderDrawLine(sdl_renderer, x * TEST_MULTISAMPLING, y * TEST_MULTISAMPLING, (x + len) * TEST_MULTISAMPLING, y * TEST_MULTISAMPLING);
+    SDL_RenderDrawLine(sdl_renderer, x, y, (x + len), y);
 }
 
 void vLine (int16_t x, int16_t y, int16_t len) {
-    SDL_RenderDrawLine(sdl_renderer, x * TEST_MULTISAMPLING, y * TEST_MULTISAMPLING, x * TEST_MULTISAMPLING, (y + len) * TEST_MULTISAMPLING);
+    SDL_RenderDrawLine(sdl_renderer, x, y, x, (y + len));
 }
 
 void pixel (int16_t x, int16_t y) {
     SDL_Rect rect = {
-        .x = x * TEST_MULTISAMPLING,
-        .y = y * TEST_MULTISAMPLING,
-        .w = TEST_MULTISAMPLING,
-        .h = TEST_MULTISAMPLING
+        .x = x,
+        .y = y,
+        .w = 1,
+        .h = 1
     };
     SDL_RenderFillRect(sdl_renderer, &rect);
 }
@@ -65,13 +65,13 @@ void text (int16_t x, int16_t y, const char *text, uint8_t fontSize) {
 			for (int px = 0; px < 5; px++) {
 				if ((HDL_FONT[text[g] * 8 + py] >> (7 - px)) & 1) {
                     SDL_Rect rect = {
-                        .x = (x + (px + acol * 5) * fontSize) * TEST_MULTISAMPLING,
-                        .y = (y + (py + line * 6) * fontSize) * TEST_MULTISAMPLING,
-                        .w = fontSize * TEST_MULTISAMPLING,
-                        .h = fontSize * TEST_MULTISAMPLING
+                        .x = (x + (px + acol * 5) * fontSize),
+                        .y = (y + (py + line * 6) * fontSize),
+                        .w = fontSize,
+                        .h = fontSize
                     };
-                    if(rect.x < 0 || rect.x + rect.w > SCREEN_WIDTH * TEST_MULTISAMPLING || 
-                        rect.y < 0 || rect.y + rect.h > SCREEN_HEIGHT * TEST_MULTISAMPLING)
+                    if(rect.x < 0 || rect.x + rect.w > SCREEN_WIDTH || 
+                        rect.y < 0 || rect.y + rect.h > SCREEN_HEIGHT)
                         continue;
                     
                     SDL_RenderFillRect(sdl_renderer, &rect);
@@ -280,6 +280,8 @@ int main (int argc, char *argv[]) {
                                        SCREEN_WIDTH * TEST_MULTISAMPLING, SCREEN_HEIGHT * TEST_MULTISAMPLING, 0);
 
     sdl_renderer = SDL_CreateRenderer(sdl_window, 0, 0);
+
+    SDL_RenderSetScale(sdl_renderer, TEST_MULTISAMPLING, TEST_MULTISAMPLING);
 
     // Initialize HDL
     hdl_interface = HDL_CreateInterface(SCREEN_WIDTH, SCREEN_HEIGHT, HDL_COLORS_MONO, 0);
